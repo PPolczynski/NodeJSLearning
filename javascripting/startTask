@@ -1,0 +1,15 @@
+#!/bin/bash
+projectFileName="program.js"
+tutorialname="javascripting"
+
+for newProject in "$@"
+do
+	if [ -d "$newProject" ]; then
+		vim "$newProject"/"$projectFileName"
+		$tutorialname verify "$newProject"/"$projectFileName"
+	else 
+		mkdir "$newProject"
+		vim "$newProject"/"$projectFileName"
+		$tutorialname verify "$newProject"/"$projectFileName"
+	fi
+done
