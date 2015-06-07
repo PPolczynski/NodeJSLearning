@@ -1,15 +1,80 @@
 #!/bin/bash
-projectFileName="program.js"
-tutorialname="javascripting"
 
+project_file_name="program.js"
+tutorial_name="javascripting"
+fav_text_editor="vim"
+
+OPTIND=1
+verify=0
+verify_and_edit=0
+run_and_edit=0
+run=0
+
+show_help () {
+	cat << EOT 
+	Usage:
+	startTask [-h|-?] prints help
+	startTask <dir name> initates or opens for editing directory with given name and opens main file of ur program	
+	startTask [-V] <dir name> -initates or opens . After done editing main file verifies it
+	startTask [-v] <dir name> - verifies main program in dir
+	startTask [-R] <dir name> -initates or opens. After done editing main file runs it
+	startTask [-r] <dir name> - runs main program in dir 
+	
+	if -vr first verify then run
+	if any combination of v and r and file dosnt exits it will be created
+	if -VR first verify then run
+	if any mix involving uppercase and lowercase. uppercase will be disregarded
+
+	by Pawel Polczynski
+EOT
+}
+
+
+while getopts "h?vVrR" opt; do
+    case "$opt" in
+    h|\?)
+        show_help
+        exit 0
+        ;;
+    V)  verify_and_edit=1
+        ;;
+    R)  run_and_edit=1
+        ;;
+    v)  verify=1
+        ;;
+    r)  run=1
+        ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+#i know there is a bit of code redundancy here but im saveing it for future improvements
 for newProject in "$@"
 do
-	if [ -d "$newProject" ]; then
-		vim "$newProject"/"$projectFileName"
-		$tutorialname verify "$newProject"/"$projectFileName"
-	else 
-		mkdir "$newProject"
-		vim "$newProject"/"$projectFileName"
-		$tutorialname verify "$newProject"/"$projectFileName"
+	if [[ -f "$newProject"/"$project_file_name"  && ( $verify -eq 1  ||  $run -eq 1 ) ]]; then
+		if [ $run -eq 1 ]; then
+			node "$newProject"/"$project_file_name"
+		fi 
+		if [ $verify -eq 1 ]; then
+			"$tutorial_name" verify "$newProject"/"$project_file_name"
+		fi
+	else
+		
+		if [ -d "$newProject" ]; then
+			"$fav_text_editor" "$newProject"/"$project_file_name"
+		else 
+			mkdir "$newProject"
+			"$fav_text_editor" "$newProject"/"$project_file_name"
+		fi
+
+		if [ $verify_and_edit -eq 1 ]; then
+			"$tutorial_name" verify "$newProject"/"$project_file_name"
+		fi
+		if [ $run_and_edit -eq 1 ]; then
+			node "$newProject"/"$project_file_name"
+		fi 
 	fi
 done
+
+
