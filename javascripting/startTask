@@ -50,31 +50,28 @@ done
 shift $((OPTIND-1))
 
 #i know there is a bit of code redundancy here but im saveing it for future improvements
-for newProject in "$@"
-do
-	if [[ -f "$newProject"/"$project_file_name"  && ( $verify -eq 1  ||  $run -eq 1 ) ]]; then
-		if [ $run -eq 1 ]; then
-			node "$newProject"/"$project_file_name"
-		fi 
-		if [ $verify -eq 1 ]; then
-			"$tutorial_name" verify "$newProject"/"$project_file_name"
-		fi
-	else
-		
-		if [ -d "$newProject" ]; then
-			"$fav_text_editor" "$newProject"/"$project_file_name"
-		else 
-			mkdir "$newProject"
-			"$fav_text_editor" "$newProject"/"$project_file_name"
-		fi
+newProject="$1"
+shift
 
-		if [ $verify_and_edit -eq 1 ]; then
-			"$tutorial_name" verify "$newProject"/"$project_file_name"
-		fi
-		if [ $run_and_edit -eq 1 ]; then
-			node "$newProject"/"$project_file_name"
-		fi 
+if [[ -f "$newProject"/"$project_file_name"  && ( $verify -eq 1  ||  $run -eq 1 ) ]]; then
+	if [ $run -eq 1 ]; then
+		node "$newProject"/"$project_file_name" "$@"
+	fi 
+	if [ $verify -eq 1 ]; then
+		"$tutorial_name" verify "$newProject"/"$project_file_name"
 	fi
-done
-
+else	
+	if [ -d "$newProject" ]; then
+		"$fav_text_editor" "$newProject"/"$project_file_name"
+	else 
+		mkdir "$newProject"
+		"$fav_text_editor" "$newProject"/"$project_file_name"
+	fi
+	if [ $verify_and_edit -eq 1 ]; then
+		"$tutorial_name" verify "$newProject"/"$project_file_name"
+	fi
+	if [ $run_and_edit -eq 1 ]; then
+		node "$newProject"/"$project_file_name" "$@"
+	fi 
+fi
 
