@@ -9,7 +9,7 @@ else {
 }
 
 function timeServer (socket) {
-	socket.end(getNow());
+	socket.end(getNow() + '\n' );
 }
 
 function getNow() {
